@@ -48,13 +48,12 @@ public class GraphDrawerUtil {
 
 		vv.getRenderContext()
 				.setVertexFillPaintTransformer(s -> {
-					if (finiteStateMachine.getFiniteStates()
-							.contains(s.toCharArray()[0])) {
+					if (finiteStateMachine.getFiniteStates().contains(s.toCharArray()[0])) {
 						return Color.CYAN;
 					} else if (finiteStateMachine.getInitialStates()
 							.contains(s.toCharArray()[0])) {
-						return Color.GREEN;
-					} else return Color.RED;
+						return Color.BLUE;
+					} else return Color.YELLOW;
 				});
 		vv.getRenderContext()
 				.setEdgeLabelTransformer(s -> s.substring(s.indexOf(":") + 1));

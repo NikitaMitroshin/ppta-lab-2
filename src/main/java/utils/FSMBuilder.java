@@ -7,7 +7,7 @@ import java.util.*;
 
 public class FSMBuilder {
 
-	private static final String ADDITIONAL_NONTERMINAL = "N";
+	private static final String ADDITIONAL_NONTERMINAL = "Z";
 	private static final String EMPTY_STRING = "ε";
 
 	public static FiniteStateMachine buildFromGrammar(Grammar grammar) {
@@ -19,9 +19,10 @@ public class FSMBuilder {
 		final List<Rule> completedRules = completeRules(grammar);
 
 		final FiniteStateMachine finiteStateMachine = new FiniteStateMachine();
-		finiteStateMachine.setStates(RuleAnalyzer.getNonterminals(completedRules));
-		finiteStateMachine.setInitialStates(new HashSet<>(StringUtil.splitToChars(grammar.getS())));
-		finiteStateMachine.setInputSymbols(grammar.getT());
+		finiteStateMachine.setStates(RuleAnalyzer.getNonterminals(completedRules)); // состояния графа - нетерминалы
+//		finiteStateMachine.setInitialStates(new HashSet<>(StringUtil.splitToChars(grammar.getS())));
+		finiteStateMachine.setInitialStates(
+				new HashSet<>(StringUtil.splitToChars(grammar.getRules().get(0).getLeft()))); // начальное оостояние
 
 		final List<TransitionFunction> transitionFunctions = GrammarRulesParser.toTransitionFunctions(completedRules);
 
@@ -39,10 +40,10 @@ public class FSMBuilder {
 		final List<Rule> rules = new ArrayList<>();
 		for (Rule rule : grammar.getRules()) {
 			String rightPart = rule.getRight();
+			// определяем нетерминал для конечного состояния (находим состояние без НЕтерминала)
 			if (rightPart.length() == 1) {
 				StringBuilder sb = new StringBuilder(rightPart);
-				rule.setRight(sb.append(ADDITIONAL_NONTERMINAL)
-						.toString());
+				rule.setRight(sb.append(ADDITIONAL_NONTERMINAL).toString());
 			}
 			rules.add(rule);
 		}
@@ -53,41 +54,42 @@ public class FSMBuilder {
 		Set<Character> finiteStates = new HashSet<>();
 		for (TransitionFunction outer : functions) {
 			boolean isFinite = true;
+			// проверяем есть ли данное состояние в каком то из состояний как точка исхода
+			// если есть то состояние не конечное
 			for (TransitionFunction inner : functions) {
-				if (outer.getOut() == inner.getIn()
-						.getState()) {
+				if (outer.getOut() == inner.getIn().getState()) {
 					isFinite = false;
 				}
 			}
-			if (isFinite) finiteStates.add(outer.getOut());
-		}
-		Map<Character, TransitionFunction> statesWithOneTransitionFunction = new HashMap<>();
-		int count = 0;
-		for (TransitionFunction outer : functions) {
-			for (TransitionFunction inner : functions) {
-				if (outer.getIn()
-						.getState()
-						.equals(inner.getIn()
-								.getState())) count++;
-			}
-			if (count == 1) {
-				statesWithOneTransitionFunction.put((Character) outer.getIn()
-						.getState(), outer);
-			}
-			count = 0;
-		}
-		for (Character state : statesWithOneTransitionFunction.keySet()) {
-			TransitionFunction function = statesWithOneTransitionFunction.get(state);
-			for (TransitionFunction f : functions) {
-				if (f.getIn()
-						.getState()
-						.equals(function.getOut())) {
-					if (statesWithOneTransitionFunction.keySet()
-							.contains(f.getIn()
-									.getState())) finiteStates.add(state);
-				}
+			if (isFinite) {
+				finiteStates.add(outer.getOut());
 			}
 		}
+
+//		Map<Character, TransitionFunction> statesWithOneTransitionFunction = new HashMap<>();
+//		int count = 0;
+//		for (TransitionFunction outer : functions) {
+//			for (TransitionFunction inner : functions) {
+//				if (outer.getIn().getState().equals(inner.getIn().getState())) {
+//					count++;
+//				}
+//			}
+//			if (count == 1) {
+//				// определяем состояния с единственным выходом
+//				statesWithOneTransitionFunction.put((Character) outer.getIn().getState(), outer);
+//			}
+//			count = 0;
+//		}
+//
+//		for (Character state : statesWithOneTransitionFunction.keySet()) {
+//			TransitionFunction function = statesWithOneTransitionFunction.get(state);
+//			for (TransitionFunction f : functions) {
+//				if (f.getIn().getState().equals(function.getOut()) &&
+//						statesWithOneTransitionFunction.keySet().contains(f.getIn().getState())) {
+//						finiteStates.add(state);
+//				}
+//			}
+//		}
 		return finiteStates;
 	}
 

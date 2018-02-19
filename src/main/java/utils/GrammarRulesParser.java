@@ -17,14 +17,16 @@ public class GrammarRulesParser {
 			TransitionFunctionInput in = new DeterministicTransitionFunctionInput();
 
 			String left = rule.getLeft();
-			if (left.length() > 1) throw new IllegalArgumentException();
+			if (left.length() > 1) {
+				throw new IllegalArgumentException();
+			}
 
-			in.setState(rule.getLeft()
-					.toCharArray()[0]);
+			in.setState(rule.getLeft().toCharArray()[0]);
 
 			List<Character> right = StringUtil.splitToChars(rule.getRight());
-			if (right.size() > 2) throw new IllegalArgumentException();
-
+			if (right.size() > 2) {
+				throw new IllegalArgumentException();
+			}
 
 			Character out = null;
 			for (Character c : right) {
@@ -34,6 +36,9 @@ public class GrammarRulesParser {
 					in.setSignal(c);
 				}
 			}
+			// создаем переход. например для правила K->1L
+			// К будет по сигналу 1 переходить в состояние L
+			//  in(K, 1), out - L
 			transitionFunctions.add(new TransitionFunction(in, out));
 		}
 		return transitionFunctions;

@@ -56,8 +56,7 @@ public class FSMDetermineUtil {
 				final Map<Character, Set<Set<Character>>> collect = transitionTable.entrySet()
 						.stream()
 						.filter(e -> {
-							if (e.getKey()
-									.getState() instanceof Character) {
+							if (e.getKey().getState() instanceof Character) {
 								final Character state = (Character) e.getKey()
 										.getState();
 								return outerEntry.getValue()

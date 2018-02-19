@@ -52,15 +52,13 @@ public class GrammarUtil {
 		return true;
 	}
 
-	// for state machines
 	private static boolean isType3(Grammar grammar) {
 		for (Rule rule : grammar.getRules()) {
 			List<Character> rightChars = StringUtil.splitToChars(rule.getRight());
 			if (rightChars.size() > 2) return false;
 			int nonterminalsCount = 0;
 			for (Character rightChar : rightChars) {
-				if (grammar.getN()
-						.contains(rightChar)) nonterminalsCount++;
+				if (grammar.getN().contains(rightChar)) nonterminalsCount++;
 			}
 
 			if (nonterminalsCount != 0) {
